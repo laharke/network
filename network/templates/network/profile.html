@@ -1,0 +1,98 @@
+{% extends "network/layout.html" %}
+{% load static %}
+
+{% block script %}
+    <script src="{% static 'network/script.js' %}"></script>
+{% endblock %}
+
+    
+{% block body %}
+    <!-- New Post -->
+    {% if notFound %}
+        <h2>{{ message }}</h2> 
+    {% else %}
+        <div class="container" style="display: flex; margin-top: 6px;">
+            <!-- La card a la izquierda -->
+            <div>
+                <div class="card" style="width:300px; height: 500px;">
+                    <img class="card-img-top" src="../../static/network/media/img_avatar1.png" alt="Card image">
+                    <div class="card-body">
+                    <h4 class="card-title">{{ userProfile }}</h4>
+                    <p class="card-text">Followers: <span id="followers">{{ seguidores }}</span></p>
+                    <p class="card-text">Following: <span id="following">{{ seguidos }}</span></p>
+                    
+                    {% if user.is_authenticated and request.user.username != userProfile %}
+                        {% if followFlag == 'follow' %}
+                            <button id="followBtn" class="btn btn-primary" onclick="un_follow({{ user_id }})">Follow</button>
+                        {% else %}
+                            <button id="followBtn" class="btn btn-danger" onclick="un_follow({{ user_id }})">Unfollow</button>
+                        {% endif %}
+                    {% endif %}
+                    </div>
+                </div>
+                <div class="container" style="margin-top: 3px;">
+                    <nav aria-label="...">
+                        <ul class="pagination">
+                            {% if page_obj.has_previous %}
+                                <a class="page-link" href="?page=1">First &raquo;</a>
+                                <li class="page-item">
+                                    <a class="page-link" tabindex="-1" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+                                </li>
+                            {% endif %}
+                            <li class="page-item active" aria-current="page">
+                                <a class="page-link" href="#">{{ page_obj.number }} <span class="sr-only">(current)</span></a>
+                            </li>
+                            {% if page_obj.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
+                                </li>
+            
+                                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Last &raquo;</a>
+                            {% endif %}
+                        </ul>
+                        Total pages: {{ page_obj.paginator.num_pages }}
+                    </nav>
+                </div>
+            </div>
+            <!-- Los post a la derecha -->
+            
+            <div class="container">
+                {% for post in page_obj %}
+                    <div class="container">
+                        <div class="tweet-container">
+                        <a href="/profile/{{post.user}}" style="font-size:8px; font-weight: bold;"><h5>{{ post.user }}</h5></a>
+                        {% if post.user.username == request.user.username %}
+                        <div class="tweet-actions">
+                            <button type="button" class="btn btn-secondary btn-sm" onclick="editPost()">Edit</button>
+                            <button type="button" style="display: none;" class="btn btn-secondary btn-sm" onclick="savePost({{ post.id }})">Save</button>
+                        </div>
+                        {% endif %}
+                        <p>{{ post.text }}</p>
+                        <p style="font-size: 13px;">{{ post.date }}</p>
+
+                        {% for key, value in likes.items %}
+                            {% if key == post.id %}
+                                <span>{{ value }}</span>
+                            {% endif %}
+                        {% endfor %}
+                        {% if user.is_authenticated %}
+                            {% if post.id in likedPostIds %}
+                                <i class="fa fa-regular fa-heart" style="color: red;" onclick="un_like({{ post.id }})"></i> 
+                            {% else %}
+                                <i class="far fa-heart" onclick="un_like({{ post.id }})"></i>
+                            {% endif %}
+                        {% else %}
+                            <i class="fa fa-regular fa-heart" style="color: red;"></i> 
+                        {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+        
+           
+        
+    {% endif %}
+
+
+{% endblock %}

@@ -1,0 +1,75 @@
+{% extends "network/layout.html" %}
+
+{% block body %}
+    <!-- New Post -->
+    {% if user.is_authenticated and newPost %}
+        <div class="post-form-wrapper" style="justify-content: center; display: flex; margin-top: 5px;">
+            <form action="{% url 'newpost' %}" method="post">
+                {% csrf_token %}
+                <div class="form-group">
+                    {{ postForm }}
+                    <input class="btn btn-primary" type="submit" value='Post'>
+                </div>
+            </form>
+        </div>
+    {% endif %}
+    
+    <!-- All posts -->
+
+    {% for post in page_obj %}
+        <div class="container">
+            <div class="tweet-container">
+            <a href="/profile/{{post.user}}" style="font-size:8px; font-weight: bold;"><h5>{{ post.user }}</h5></a>
+            {% if post.user.username == request.user.username %}
+            <div class="tweet-actions">
+                <button type="button" class="btn btn-secondary btn-sm" onclick="editPost()">Edit</button>
+                <button type="button" style="display: none;" class="btn btn-secondary btn-sm" onclick="savePost({{ post.id }})">Save</button>
+            </div>
+            {% endif %}
+            <p>{{ post.text }}</p>
+            <p style="font-size: 13px;">{{ post.date }}</p>
+
+            {% for key, value in likes.items %}
+                {% if key == post.id %}
+                    <span>{{ value }}</span>
+                {% endif %}
+            {% endfor %}
+            {% if user.is_authenticated %}
+                {% if post.id in likedPostIds %}
+                    <i class="fa fa-regular fa-heart" style="color: red;" onclick="un_like({{ post.id }})"></i> 
+                {% else %}
+                    <i class="far fa-heart" onclick="un_like({{ post.id }})"></i>
+                {% endif %}
+            {% else %}
+                <i class="fa fa-regular fa-heart" style="color: red;"></i> 
+            {% endif %}
+            </div>
+        </div>
+    {% endfor %}
+    
+    <div class="container">
+        <nav aria-label="...">
+            <ul class="pagination">
+                {% if page_obj.has_previous %}
+                    <a class="page-link" href="?page=1">First &raquo;</a>
+                    <li class="page-item">
+                        <a class="page-link" tabindex="-1" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+                    </li>
+                {% endif %}
+                <li class="page-item active" aria-current="page">
+                    <a class="page-link" href="#">{{ page_obj.number }} <span class="sr-only">(current)</span></a>
+                </li>
+                {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
+                    </li>
+
+                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Last &raquo;</a>
+                {% endif %}
+            </ul>
+            Total pages: {{ page_obj.paginator.num_pages }}
+        </nav>
+    </div>
+
+    
+{% endblock %}

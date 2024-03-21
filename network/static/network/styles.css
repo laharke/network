@@ -1,0 +1,21 @@
+.tweet-container {
+    border: 1px solid #ccc;
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+.tweet-actions {
+float: right;
+}
+
+
+
+.alert {
+  width: fit-content !important;
+  text-align: center !important;
+  position: fixed !important;
+  top: 10% !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  padding: 10px 20px !important;
+  z-index: 1000 !important; /* Ensure it's on top of other elements */
+}
